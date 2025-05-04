@@ -46,7 +46,7 @@ elif option == "Fetch from Yahoo Finance":
             st.error(f"Data fetch failed: {str(e)}")
 
 # Main Interface
-st.title("Apki pasandeedah Stock Aunty")
+st.title("Aunty ka stock secret")
 
 def home():
     st.markdown("## 👋 Khush Amdeed to the *Aunty’s Stock School*!")
@@ -56,7 +56,11 @@ def home():
 
 st.image("aunty stock.png", width=100)
 st.markdown("""
-    Aunty kehti hain: "Beta, stocks mein sirf luck nahi, logic bhi hota hai. Aao sikhun tumhein!"
+    Aksar jo desi aunties hoti hain, unka gyaan sunna thora frustrating ho sakta hai
+    Wo hamesha koi na koi taana deti hain, ya phir bas zyada hi poking kar leti hain.
+    Lekin yeh Aunty alag hai! inki poori koshish hai aapki madad karna, aur stock market ko samajhne mein apko raah dikhana.
+    Yeh application aapko stock data ko analyse karne, seekhne aur invest karne mein madad karegi. 
+    Toh aaiye, is Aunty ke saath apna stock journey shuru karein – pehli baar bilkul friendly tareeke se!"
 """)
 
 if data is not None:
