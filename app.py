@@ -62,7 +62,14 @@ st.markdown("""
     Toh aaiye, is Aunty ke saath apna stock journey shuru karein – pehli baar bilkul friendly tareeke se!"
 """)
 
+# Main Interface
 if data is not None:
+    # Preprocess the data first
+    data = preprocess_data(data)
+    
+    # Feature Engineering
+    data = feature_engineer(data)
+    
     step = st.radio("Select ML Step", [
         "1. Preview Data",
         "2. Preprocess",
@@ -73,6 +80,9 @@ if data is not None:
         "7. Evaluation",
         "8. Visualize Results"
     ])
+
+    # Remaining steps as per your existing flow...
+
 
     if step == "1. Preview Data":
         st.write(data.head())
