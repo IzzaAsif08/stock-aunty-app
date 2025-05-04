@@ -18,6 +18,7 @@ with open("styles.css") as f:
 
 # Sidebar - Upload or fetch data
 st.sidebar.image("assets/logo.png", use_column_width=True)
+
 st.sidebar.markdown("## Aunty Ki Guidance Center")
 
 option = st.sidebar.radio("Select Data Source:", ["Upload CSV (Kragle)", "Fetch from Yahoo Finance"])
