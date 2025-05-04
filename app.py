@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import yfinance as yf
 from helper import preprocess_data, feature_engineer, train_test, train_logistic_regression
-#from visuals import plot_kmeans_clusters, evaluate_model, visualize_predictions
+from visuals import plot_kmeans_clusters, evaluate_model, visualize_predictions
 import datetime
 
 # Streamlit Page Configuration
@@ -46,7 +46,6 @@ elif option == "Fetch from Yahoo Finance":
             st.error(f"Data fetch failed: {str(e)}")
 
 # Main Interface
-st.title("Aunty ka stock secret")
 
 def home():
     st.markdown("## 👋 Khush Amdeed to the *Aunty’s Stock School*!")
