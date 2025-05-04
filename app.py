@@ -17,7 +17,8 @@ with open("styles.css") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 # Sidebar - Upload or fetch data
-st.sidebar.image("assets/logo.png", use_column_width=True)
+st.sidebar.image("assets/logo.png", use_container_width=True)
+
 
 st.sidebar.markdown("## Aunty Ki Guidance Center")
 
