@@ -54,7 +54,7 @@ def home():
     # Display welcome GIF
     st.image("https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExNXA1dm55emZvYW1jeWFhbGxvZWlwNDdxMzNuejNrdGJ0eWcycXNrNyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/P4iv1IkJxwkODZOH8Q/giphy.gif", use_column_width=True)
 
-st.image("aunty stock.png", width=350)
+st.image("aunty stock.png", width=100)
 st.markdown("""
     Aunty kehti hain: "Beta, stocks mein sirf luck nahi, logic bhi hota hai. Aao sikhun tumhein!"
 """)
