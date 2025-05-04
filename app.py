@@ -53,7 +53,6 @@ def home():
     # Display welcome GIF
     st.image("https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExNXA1dm55emZvYW1jeWFhbGxvZWlwNDdxMzNuejNrdGJ0eWcycXNrNyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/P4iv1IkJxwkODZOH8Q/giphy.gif", width=200)
 
-st.image("aunty stock.png", width=100)
 st.markdown("""
     Aksar jo desi aunties hoti hain, unka gyaan sunna thora frustrating ho sakta hai
     Wo hamesha koi na koi taana deti hain, ya phir bas zyada hi poking kar leti hain.
