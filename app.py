@@ -52,7 +52,7 @@ def home():
     st.markdown("## 👋 Khush Amdeed to the *Aunty’s Stock School*!")
     
     # Display welcome GIF
-    st.image("https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExNXA1dm55emZvYW1jeWFhbGxvZWlwNDdxMzNuejNrdGJ0eWcycXNrNyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/P4iv1IkJxwkODZOH8Q/giphy.gif", use_column_width=True)
+    st.image("https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExNXA1dm55emZvYW1jeWFhbGxvZWlwNDdxMzNuejNrdGJ0eWcycXNrNyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/P4iv1IkJxwkODZOH8Q/giphy.gif", width=200)
 
 st.image("aunty stock.png", width=100)
 st.markdown("""
