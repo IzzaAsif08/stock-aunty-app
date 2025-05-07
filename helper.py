@@ -1,40 +1,38 @@
 import pandas as pd
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression
-from sklearn.cluster import KMeans
-from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import mean_squared_error
 
-def preprocess_data(df):
+def load_and_preprocess_data(filepath):
+    df = pd.read_csv(filepath, parse_dates=["Date"])
+    df = df.sort_values("Date")
+    
+    # Remove missing values
     df = df.dropna()
-    df = df.select_dtypes(include=['number'])
-    scaler = StandardScaler()
-    df_scaled = pd.DataFrame(scaler.fit_transform(df), columns=df.columns)
-    return df_scaled
 
-def feature_engineer(df):
-    if 'Close' in df.columns:
-        df['Return'] = df['Close'].pct_change()
-        df.dropna(inplace=True)
-    return df
+    # Optional: filter to one stock if your dataset has multiple tickers
+    if "Ticker" in df.columns:
+        df = df[df["Ticker"] == "AAPL"]  # You can change this
 
-def train_test(df):
-    if 'Return' not in df.columns:
-        raise ValueError("Data must contain a 'Return' column for target variable.")
-    X = df.drop('Return', axis=1)
-    y = (df['Return'] > 0).astype(int)
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    return X_train, X_test, y_train, y_test
+    # Feature engineering
+    df["Return"] = df["Close"].pct_change()
+    df["MA_10"] = df["Close"].rolling(window=10).mean()
+    df["Volatility"] = df["Close"].rolling(window=10).std()
 
-def train_logistic_regression(X_train, y_train):
-    model = LogisticRegression(max_iter=1000)
+    df = df.dropna()
+
+    # Features and target
+    X = df[["Open", "High", "Low", "Volume", "MA_10", "Volatility"]]
+    y = df["Close"]
+
+    return X, y, df
+
+def train_model(X, y):
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=False)
+
+    model = RandomForestRegressor(n_estimators=100, random_state=42)
     model.fit(X_train, y_train)
-    return model
+    preds = model.predict(X_test)
+    mse = mean_squared_error(y_test, preds)
 
-def train_kmeans(df, n_clusters=3):
-    if df.empty or len(df.columns) == 0:
-        raise ValueError("Dataframe is empty or lacks columns for clustering.")
-    scaler = StandardScaler()
-    df_scaled = pd.DataFrame(scaler.fit_transform(df), columns=df.columns)
-    kmeans = KMeans(n_clusters=n_clusters, random_state=42)
-    kmeans.fit(df_scaled)
-    return kmeans
+    return model, mse, preds, y_test
