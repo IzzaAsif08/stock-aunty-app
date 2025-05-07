@@ -1,54 +1,123 @@
 import streamlit as st
 import pandas as pd
-from sklearn.linear_model import LogisticRegression
-from sklearn.cluster import KMeans
+import yfinance as yf
+import datetime
+from helper import preprocess_data, feature_engineer, train_test, train_logistic_regression, train_kmeans
+from visuals import plot_kmeans_clusters, evaluate_model, visualize_predictions, pie_chart_split
 
-from helper import load_data, preprocess_data, split_data
-from visuals import pie_chart_split, plot_kmeans_clusters, evaluate_model, visualize_predictions
+# Streamlit Page Configuration
+st.set_page_config(
+    page_title="Stock Aunty ko sab maloom hai!",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 
-st.set_page_config(page_title="ML Visualizer", layout="wide")
-st.title("🧠 Machine Learning Visualizer")
+# Custom CSS Styling
+with open("styles.css") as f:
+    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
-# Sidebar
-st.sidebar.header("Upload Dataset")
-uploaded_file = st.sidebar.file_uploader("Upload CSV file", type=["csv"])
+# Sidebar - Upload or fetch data
+st.sidebar.image("logo.png", use_container_width=True)
+st.sidebar.markdown("## Aunty ka MUFT ka gyaan pehli baar faideymand!")
 
-if uploaded_file:
-    df = load_data(uploaded_file)
+option = st.sidebar.radio("Select Data Source:", ["Upload CSV (Kragle)", "Fetch from Yahoo Finance"])
+data = None
 
-    if df is not None:
-        st.write("### Raw Data Preview")
-        st.dataframe(df)
+if option == "Upload CSV (Kragle)":
+    uploaded_file = st.sidebar.file_uploader("Upload your dataset", type="csv")
+    if uploaded_file:
+        data = pd.read_csv(uploaded_file)
+        st.success("Dataset loaded from Kragle 👵")
 
-        task_type = st.sidebar.selectbox("Select Task Type", ["Classification", "Clustering"])
-        target_col = None
+elif option == "Fetch from Yahoo Finance":
+    ticker = st.sidebar.text_input("Enter Stock Ticker:", "AAPL")
+    start_date = st.sidebar.date_input("Start Date", min_value=datetime.date(2000, 1, 1))
+    end_date = st.sidebar.date_input("End Date", max_value=datetime.date.today())
 
-        if task_type == "Classification":
-            target_col = st.sidebar.selectbox("Select Target Column", df.columns)
+    if st.sidebar.button("Fetch Data"):
+        try:
+            data = yf.download(ticker, start=start_date, end=end_date)
+            st.success(f"Data fetched for {ticker} from Yahoo Finance")
+        except Exception as e:
+            st.error(f"Data fetch failed: {str(e)}")
 
-        # Preprocess
-        X, y, feature_names = preprocess_data(df, target_col)
-        X_train, X_test, y_train, y_test = split_data(X, y)
+# Main Interface
+def home():
+    st.markdown("## 👋 Khush Amdeed to the *Aunty’s Stock School*!")
+    st.image("https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExNXA1dm55emZvYW1jeWFhbGxvZWlwNDdxMzNuejNrdGJ0eWcycXNrNyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/P4iv1IkJxwkODZOH8Q/giphy.gif", width=200)
 
-        # Pie chart of split
+st.image("aunty stock.png", width=100)
+st.markdown("""
+    Aksar jo desi aunties hoti hain, unka gyaan sunna thora frustrating ho sakta hai.
+    Wo hamesha koi na koi taana deti hain, ya phir bas zyada hi poking kar leti hain.
+    Lekin yeh Aunty alag hai! Inki poori koshish hai aapki madad karna, aur stock market ko samajhne mein apko raah dikhana.
+    Yeh application aapko stock data ko analyse karne, seekhne aur invest karne mein madad karegi. 
+    Toh aaiye, is Aunty ke saath apna stock journey shuru karein – pehli baar bilkul friendly tareeke se!
+""")
+
+if data is not None:
+    step = st.radio("Select ML Step", [
+        "1. Preview Data",
+        "2. Preprocess",
+        "3. Feature Engineering",
+        "4. Train/Test Split",
+        "5. Logistic Regression",
+        "6. K-Means Clustering",
+        "7. Evaluation",
+        "8. Visualize Results"
+    ])
+
+    if step == "1. Preview Data":
+        st.write(data.head())
+        st.success("Data dekh liya, shabash!")
+
+    elif step == "2. Preprocess":
+        data = preprocess_data(data)
+        st.write(data.head())
+        st.success("Missing values aur outliers ki safai ho gayi!")
+
+    elif step == "3. Feature Engineering":
+        data = feature_engineer(data)
+        st.write(data.head())
+        st.success("Features select aur transform kar diye gaye hain.")
+
+    elif step == "4. Train/Test Split":
+        X_train, X_test, y_train, y_test = train_test(data)
         pie_chart_split(X_train, X_test)
+        st.session_state.update({
+            "X_train": X_train,
+            "X_test": X_test,
+            "y_train": y_train,
+            "y_test": y_test
+        })
+        st.success("Training aur testing split ready hai!")
 
-        if task_type == "Classification":
-            model = LogisticRegression()
-            model.fit(X_train, y_train)
-            st.success("✅ Logistic Regression model trained!")
+    elif step == "5. Logistic Regression":
+        if "X_train" in st.session_state:
+            model_lr = train_logistic_regression(st.session_state.X_train, st.session_state.y_train)
+            st.session_state.model_lr = model_lr
+            st.success("Aunty ne logistic regression train kar diya hai!")
+        else:
+            st.warning("Pehle Train/Test split karna hoga.")
 
-            evaluate_model(model, X_test, y_test)
-            visualize_predictions(model, X_test, y_test)
+    elif step == "6. K-Means Clustering":
+        kmeans_model = train_kmeans(data)
+        plot_kmeans_clusters(data, kmeans_model)
+        st.success("K-means se clusters ban gaye!")
 
-        elif task_type == "Clustering":
-            num_clusters = st.sidebar.slider("Select Number of Clusters (k)", min_value=2, max_value=10, value=3)
-            kmeans = KMeans(n_clusters=num_clusters, random_state=42)
-            kmeans.fit(X)
+    elif step == "7. Evaluation":
+        if "model_lr" in st.session_state:
+            evaluate_model(st.session_state.model_lr, st.session_state.X_test, st.session_state.y_test)
+            st.success("Model ka evaluation ho gaya!")
+        else:
+            st.warning("Pehle Logistic Regression train karo.")
 
-            plot_kmeans_clusters(pd.DataFrame(X, columns=feature_names), kmeans)
-
-    else:
-        st.error("❌ Failed to load CSV. Please check the file format.")
+    elif step == "8. Visualize Results":
+        if "model_lr" in st.session_state:
+            visualize_predictions(st.session_state.model_lr, st.session_state.X_test, st.session_state.y_test)
+            st.success("Results ke graphs taiyaar hain!")
+        else:
+            st.warning("Pehle Logistic Regression train karo.")
 else:
-    st.info("👈 Upload a CSV file to get started.")
+    home()
+    st.info("Pehle apna data upload karo ya phir Yahoo se le lo.")
